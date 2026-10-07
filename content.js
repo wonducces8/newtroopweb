@@ -1,7 +1,7 @@
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 let contentClientPromise;
 function getContentClient() {
-  if (!contentClientPromise) contentClientPromise = import(SUPABASE_CDN).then(({ createClient }) => {
+  if (!contentClientPromise) contentClientPromise = window.TROOP_SUPABASE_PROMISE || import(SUPABASE_CDN).then(({ createClient }) => {
     const cfg = window.TROOP_CONFIG || {};
     if (!cfg.supabaseUrl || !cfg.supabasePublishableKey) return null;
     return createClient(cfg.supabaseUrl, cfg.supabasePublishableKey);
