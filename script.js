@@ -20,10 +20,11 @@ if (header) {
   function showAdminTools(session) { tools.hidden = !session; }
   const config = window.TROOP_CONFIG || {};
   if (config.supabaseUrl && config.supabasePublishableKey) {
-    import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({createClient}) => {
-      siteSupabase = createClient(config.supabaseUrl, config.supabasePublishableKey);
-      siteSupabase.auth.getSession().then(result => showAdminTools(result.data.session)).catch(() => {});
-      siteSupabase.auth.onAuthStateChange((_event, session) => { setTimeout(() => showAdminTools(session), 0); });
+    window.TROOP_SUPABASE_PROMISE = window.TROOP_SUPABASE_PROMISE || import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({createClient}) => createClient(config.supabaseUrl, config.supabasePublishableKey));
+    window.TROOP_SUPABASE_PROMISE.then(client => {
+      siteSupabase = client;
+      client.auth.getSession().then(result => showAdminTools(result.data.session)).catch(() => {});
+      client.auth.onAuthStateChange((_event, session) => { setTimeout(() => showAdminTools(session), 0); });
     }).catch(() => {});
   }
 }
