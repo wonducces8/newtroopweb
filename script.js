@@ -10,8 +10,8 @@ if (header) {
   const nav = header.querySelector('.nav');
   navItems.forEach(([label, href]) => { const a = document.createElement('a'); a.href = href; a.textContent = label; if (href === currentFile) a.setAttribute('aria-current','page'); nav.append(a); });
   const visit = document.createElement('a'); visit.href = 'contact.html'; visit.className = 'nav-cta'; visit.textContent = 'Visit a meeting ↗'; nav.append(visit);
-  const tools = document.createElement('div'); tools.className = 'site-admin-tools'; tools.hidden = true;
-  tools.innerHTML = '<a href="admin.html">Admin tools <span aria-hidden="true">↗</span></a><button type="button" data-site-signout>Sign out</button>';
+  const tools = document.createElement('div'); tools.className = 'site-admin-tools'; tools.hidden = false;
+  tools.innerHTML = '<a data-site-account href="login.html">Sign in</a><a data-site-upload href="photos.html#member-photo-tools" hidden>Photo tools ↗</a><a data-site-admin href="admin.html" hidden>Admin tools ↗</a><button type="button" data-site-signout hidden>Sign out</button>';
   nav.append(tools);
   const toggle = header.querySelector('.menu-toggle');
   toggle.addEventListener('click', () => { const open = toggle.getAttribute('aria-expanded') === 'true'; toggle.setAttribute('aria-expanded',String(!open)); toggle.setAttribute('aria-label',open?'Open menu':'Close menu'); nav.classList.toggle('open',!open); });
