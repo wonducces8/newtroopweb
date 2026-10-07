@@ -20,6 +20,13 @@ function safeText(value) {
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
   });
 }
+function contactName(name, email) {
+  const safeName = safeText(name);
+  const address = String(email || '').trim();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)
+    ? '<a class="roster-email-link" href="mailto:' + safeText(address) + '">' + safeName + '</a>'
+    : safeName;
+}
 function renderRoster(selector, rows, emptyMessage, isPatrol) {
   const target = document.querySelector(selector);
   if (!target) return;
@@ -28,8 +35,8 @@ function renderRoster(selector, rows, emptyMessage, isPatrol) {
     return;
   }
   target.innerHTML = rows.map(function (row) {
-    if (isPatrol) return '<article class="patrol-card"><h3>' + safeText(row.name) + '</h3><p>' + safeText(row.description || '') + (row.leader ? ' · Patrol leader: ' + safeText(row.leader) : '') + '</p></article>';
-    return '<div class="leader-row"><span>' + safeText(row.role) + '</span><b>' + safeText(row.name) + '</b></div>';
+    if (isPatrol) return '<article class="patrol-card"><h3>' + safeText(row.name) + '</h3><p>' + safeText(row.description || '') + (row.leader ? ' · Patrol leader: ' + contactName(row.leader, row.leader_email) : '') + '</p></article>';
+    return '<div class="leader-row"><span>' + safeText(row.role) + '</span><b>' + contactName(row.name, row.email) + '</b></div>';
   }).join('');
 }
 async function loadRoster() {

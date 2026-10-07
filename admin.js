@@ -17,6 +17,7 @@ function rowHtml(kind, item = {}) {
   let html = '<div class="edit-row" data-kind="' + kind + '">';
   html += '<label>' + (patrol ? 'Patrol name' : 'Position') + '<input data-field="' + (patrol ? 'name' : 'role') + '" value="' + escapeHtml(item[patrol ? 'name' : 'role']) + '" required></label>';
   html += '<label>' + (patrol ? 'Patrol leader (optional)' : 'Scout name') + '<input data-field="' + (patrol ? 'leader' : 'name') + '" value="' + escapeHtml(item[patrol ? 'leader' : 'name']) + '" ' + (patrol ? '' : 'required') + '></label>';
+  html += '<label>' + (patrol ? 'Patrol leader email (optional)' : 'Scout email (optional)') + '<input data-field="' + (patrol ? 'leader_email' : 'email') + '" type="email" value="' + escapeHtml(item[patrol ? 'leader_email' : 'email']) + '" placeholder="name@example.com"></label>';
   if (patrol) html += '<label>Description (optional)<textarea data-field="description">' + escapeHtml(item.description) + '</textarea></label>';
   return html + '<button type="button" class="remove-row" aria-label="Remove row">Remove</button></div>';
 }
@@ -76,7 +77,7 @@ async function loadEditors(user) {
   currentAdminId = user.id;
   const access = await supabase.from('site_admins').select('user_id').eq('user_id', user.id).maybeSingle();
   if (access.error || !access.data) throw new Error('This account is not on the admin allowlist. Add it in Supabase, then sign in again.');
-  const result = await supabase.from('troop_content').select('key,value').in('key', ['patrols','leaders','announcement','socials']);
+  const result = await supabase.from('troop_content').select('key,value').in('key', ['patrols','leaders','announcement','socials','visuals']);
   if (result.error) throw result.error;
   const values = {};
   (result.data || []).forEach(row => { values[row.key] = row.value; });
@@ -90,6 +91,7 @@ async function loadEditors(user) {
   await loadAccessRequests();
   loginForm.hidden = true; editor.hidden = false;
   await loadPhotos();
+  await loadVisualSettings();
 }
 async function loadPhotos() {
   const target = document.querySelector('#photo-library');
@@ -103,6 +105,29 @@ async function loadPhotos() {
     const url = supabase.storage.from(bucket).getPublicUrl(photo.path).data.publicUrl;
     return '<article class="library-photo"><img src="' + escapeHtml(url) + '" alt="' + escapeHtml(photo.caption || 'Troop photo') + '"><div class="library-photo-edit"><small>' + escapeHtml(photo.folder_name) + '</small><label>Caption<input data-caption-for="' + escapeHtml(photo.path) + '" maxlength="180" value="' + escapeHtml(photo.caption) + '" placeholder="Optional caption"></label><div class="photo-actions"><button class="button button-green" type="button" data-save-caption="' + escapeHtml(photo.path) + '">Save caption</button><button class="remove-row" type="button" data-photo-delete="' + escapeHtml(photo.path) + '">Delete</button></div></div></article>';
   }).join('');
+}
+async function loadVisualSettings() {
+  const target = document.querySelector('#visual-slot-editor');
+  if (!target) return;
+  const [photoResult, contentResult] = await Promise.all([
+    supabase.from('photo_library').select('path,folder_name,caption,created_at').order('created_at', {ascending:false}).limit(250),
+    supabase.from('troop_content').select('value').eq('key','visuals').maybeSingle()
+  ]);
+  if (photoResult.error) { target.innerHTML = '<p class="notice">Could not load photo choices: ' + escapeHtml(photoResult.error.message) + '</p>'; return; }
+  const photos = photoResult.data || [];
+  const saved = contentResult.data && contentResult.data.value || {};
+  const slots = [
+    ['home-hero','Home page · large hero'],
+    ['home-camp','Home page · camp card'],
+    ['home-skills','Home page · skills card'],
+    ['home-service','Home page · service card'],
+    ['about-camp','Our Troop · camp'],
+    ['about-skills','Our Troop · outdoor skills'],
+    ['about-service','Our Troop · service'],
+    ['photos-hero','Photos page · title image']
+  ];
+  const choices = (blankLabel) => '<option value="">' + blankLabel + '</option>' + photos.map(photo => '<option value="' + escapeHtml(photo.path) + '">' + escapeHtml(photo.folder_name + ' · ' + (photo.caption || photo.path.split('/').pop())) + '</option>').join('');
+  target.innerHTML = slots.map(([key,label]) => '<label class="visual-choice"><span>' + escapeHtml(label) + '</span><select data-visual-slot="' + key + '"><option value="">'+(key==='home-hero'?'Shuffle archive photos':'Keep original artwork')+'</option>'+photos.map(photo=>'<option value="'+escapeHtml(photo.path)+'"'+(saved[key]===photo.path?' selected':'')+'>'+escapeHtml(photo.folder_name+' · '+(photo.caption||photo.path.split('/').pop()))+'</option>').join('')+'</select></label>').join('');
 }
 async function refreshSession(session) {
   if (!session) { loginForm.hidden = false; editor.hidden = true; return; }
@@ -143,6 +168,15 @@ loginForm.addEventListener('submit', async event => {
   const result = await supabase.auth.signInWithPassword({email: form.get('email'), password: form.get('password')});
   button.disabled = false;
   if (result.error) message('Sign in failed: ' + result.error.message, 'admin-status-error');
+});
+document.querySelector('#save-visuals').addEventListener('click', async event => {
+  const button = event.currentTarget; button.disabled = true;
+  const value = {};
+  document.querySelectorAll('[data-visual-slot]').forEach(select => { if (select.value) value[select.dataset.visualSlot] = select.value; });
+  const result = await supabase.from('troop_content').upsert({key:'visuals',value,updated_at:new Date().toISOString()},{onConflict:'key'});
+  button.disabled = false;
+  if (result.error) message('Could not save photo choices: ' + result.error.message, 'admin-status-error');
+  else message('Photo choices saved. The home hero will shuffle the archive unless a fixed photo is selected.', 'admin-status-good');
 });
 document.querySelector('#sign-out').addEventListener('click', async () => { if (supabase) await supabase.auth.signOut(); });
 document.querySelector('#library-folder').addEventListener('change', loadPhotos);

@@ -45,3 +45,8 @@ Supabase function deployment guide: [Deploy Edge Functions](https://supabase.com
 Photos are resized to at most 2048 px on their longest side and converted to WebP while preserving their aspect ratio. Captions are optional and hidden from the public gallery when blank. The gallery starts newest first; visitors can shuffle it. The full-screen viewer keeps the whole image reachable, including tall photos.
 
 Only upload images that are appropriate for public sharing. Member uploads publish immediately; curators and administrators can remove them from the archive.
+
+
+## Refreshed site photography
+
+After the existing setup and member migration have been applied, run `supabase-visual-slots-migration.sql` in the Supabase SQL Editor. This allows administrators to save photo assignments for the site's visual slots. The home page hero shuffles through the public photo archive by default; administrators can choose a fixed photo in Admin → Site photography. Optional emails entered for roster members are public mail links on the People page.

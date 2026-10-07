@@ -1,3 +1,4 @@
+const refreshStyle = document.createElement('link'); refreshStyle.rel = 'stylesheet'; refreshStyle.href = 'refresh.css'; document.head.append(refreshStyle);
 const navItems = [['Home','index.html'],['Our Troop','about.html'],['Calendar','calendar.html'],['Photos','photos.html'],['People','people.html']];
 const currentFile = location.pathname.split('/').pop() || 'index.html';
 const header = document.querySelector('[data-site-header]');
@@ -60,3 +61,42 @@ if (header) {
 }
 if (footer) { footer.innerHTML = '<div class="wrap footer-top"><a class="brand" href="index.html"><span class="brand-mark">1941</span><span><b>Troop 1941</b><small>Leesburg, Virginia</small></span></a><p>Adventure, leadership, service.</p><div class="footer-outlinks"><div class="footer-links"><a href="calendar.html">Calendar</a><a href="contact.html">Visit us</a><a href="admin.html">Admin</a></div><div class="social-links" data-social-links hidden></div></div></div><div class="wrap footer-bottom"><span>© <span data-year></span> Troop 1941</span><span>Chartered by Isaak Walton League of America</span></div>'; }
 document.querySelectorAll('[data-year]').forEach((node) => node.textContent = new Date().getFullYear());
+
+async function applyPhotoSlots() {
+  const slots = Array.from(document.querySelectorAll('[data-photo-slot]'));
+  if (!slots.length) return;
+  const cfg = window.TROOP_CONFIG || {};
+  if (!cfg.supabaseUrl || !cfg.supabasePublishableKey) return;
+  try {
+    const client = await (window.TROOP_SUPABASE_PROMISE || (window.TROOP_SUPABASE_PROMISE = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({createClient}) => createClient(cfg.supabaseUrl,cfg.supabasePublishableKey))));
+    const [photoResult,visualResult] = await Promise.all([
+      client.from('photo_library').select('path,created_at').order('created_at',{ascending:false}).limit(250),
+      client.from('troop_content').select('value').eq('key','visuals').maybeSingle()
+    ]);
+    if (photoResult.error) return;
+    const photos = photoResult.data || [];
+    const choices = visualResult.data && visualResult.data.value || {};
+    const urlFor = path => client.storage.from('troop-photos').getPublicUrl(path).data.publicUrl;
+    for (const slot of slots.filter(node => node.dataset.photoSlot !== 'home-hero')) {
+      const path = choices[slot.dataset.photoSlot];
+      if (!path) continue;
+      slot.style.setProperty('--slot-photo','url('+JSON.stringify(urlFor(path))+')');
+      slot.classList.add('has-photo');
+    }
+    const hero = slots.find(node => node.dataset.photoSlot === 'home-hero');
+    if (!hero || !photos.length) return;
+    let path = choices['home-hero'];
+    let order = photos.map(photo=>photo.path).filter(photoPath=>photoPath!==path);
+    for (let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+    const playlist = path ? [path] : order;
+    if (!playlist.length) return;
+    const layers = [document.createElement('div'),document.createElement('div')];
+    layers.forEach(layer=>{layer.className='hero-photo-layer';hero.prepend(layer);});
+    hero.classList.add('has-photo-backdrop');
+    let index=0, active=0;
+    const showNext=()=>{const layer=layers[active];layer.style.backgroundImage='url('+JSON.stringify(urlFor(playlist[index%playlist.length]))+')';layer.classList.add('is-active');layers[1-active].classList.remove('is-active');active=1-active;index++;};
+    showNext();
+    if (!path && playlist.length>1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(showNext,6500);
+  } catch {}
+}
+applyPhotoSlots();

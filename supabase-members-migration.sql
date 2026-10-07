@@ -192,3 +192,9 @@ create policy "Contributors can clean up orphan uploads"
       select 1 from public.photo_library where path = storage.objects.name
     )
   );
+
+
+-- Allow the refreshed site's saved photo slot choices.
+alter table public.troop_content drop constraint if exists troop_content_key_check;
+alter table public.troop_content add constraint troop_content_key_check
+  check (key in ('patrols', 'leaders', 'announcement', 'socials', 'visuals'));
