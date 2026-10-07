@@ -1,1 +1,35 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Troop 1941 roster administration"><title>Admin · Troop 1941</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="admin.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="header" data-site-header></header><main id="main"><section class="page-hero"><div class="wrap"><div class="kicker"><span class="dot"></span> TROOP 1941 · ADMIN</div><h1>Roster <em>editor.</em></h1><p>Sign in to update the patrol and leadership details shown on the public site.</p></div></section><section class="page-content"><div class="wrap admin-wrap"><div id="admin-status" class="notice" role="status">Connect Supabase to enable the secure admin editor.</div><form id="login-form" class="info-card login-card"><h2>Administrator sign in</h2><label>Email<input name="email" type="email" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button class="button button-green" type="submit">Sign in →</button></form><section id="editor" hidden><div class="admin-heading"><div><div class="kicker">SIGNED IN</div><p id="admin-email"></p></div><button id="sign-out" class="button button-dark" type="button">Sign out</button></div><section class="info-card editor-card"><div class="editor-title"><div><h2>Patrols</h2><p>Update patrol names, leaders, and descriptions.</p></div><button class="button button-green" data-add="patrols" type="button">+ Add patrol</button></div><div id="patrol-editor" class="edit-rows"></div><button class="button button-dark save-button" data-save="patrols" type="button">Save patrols</button></section><section class="info-card editor-card"><div class="editor-title"><div><h2>Leadership</h2><p>Update troop roles and the scouts holding each role.</p></div><button class="button button-green" data-add="leaders" type="button">+ Add role</button></div><div id="leader-editor" class="edit-rows"></div><button class="button button-dark save-button" data-save="leaders" type="button">Save leadership</button></section></section></div></section></main><footer class="footer" data-site-footer></footer><script src="config.js"></script><script src="script.js"></script><script type="module" src="admin.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Troop 1941 roster administration">
+  <title>Admin · Troop 1941</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header" data-site-header></header>
+<main id="main">
+  <section class="page-hero"><div class="wrap"><div class="kicker"><span class="dot"></span> TROOP 1941 · ADMIN</div><h1>Roster <em>editor.</em></h1><p>Keep troop details current, share a quick announcement, and manage the photo library.</p></div></section>
+  <section class="page-content"><div class="wrap admin-wrap">
+    <div id="admin-status" class="notice" role="status">Checking Supabase connection…</div>
+    <form id="login-form" class="info-card login-card">
+      <h2>Administrator sign in</h2>
+      <label>Email<input name="email" type="email" autocomplete="username" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="button button-green" type="submit">Sign in →</button>
+    </form>
+    <section id="editor" hidden>
+      <div class="admin-heading"><div><div class="kicker">SIGNED IN</div><p id="admin-email"></p></div><button id="sign-out" class="button button-dark" type="button">Sign out</button></div>
+      <section class="info-card editor-card"><div class="editor-title"><div><h2>Patrols</h2><p>Update patrol names, leaders, and descriptions.</p></div><button class="button button-green" data-add="patrols" type="button">+ Add patrol</button></div><div id="patrol-editor" class="edit-rows"></div><button class="button button-dark save-button" data-save="patrols" type="button">Save patrols</button></section>
+      <section class="info-card editor-card"><div class="editor-title"><div><h2>Leadership</h2><p>Update troop roles and the scouts holding each role.</p></div><button class="button button-green" data-add="leaders" type="button">+ Add role</button></div><div id="leader-editor" class="edit-rows"></div><button class="button button-dark save-button" data-save="leaders" type="button">Save leadership</button></section>
+      <section class="info-card editor-card"><div class="editor-title"><div><h2>Troop announcement</h2><p>Post a short update on the home page, or turn it off when it’s no longer needed.</p></div></div><label class="wide-label" for="announcement-text">Message</label><textarea id="announcement-text" class="admin-textarea" maxlength="240" placeholder="Example: No meeting this Monday—see you at the campout!"></textarea><label class="check-label"><input id="announcement-active" type="checkbox"> Show this announcement on the home page</label><button class="button button-dark save-button" data-save="announcement" type="button">Save announcement</button></section>
+      <section class="info-card editor-card"><div class="editor-title"><div><h2>Photo library</h2><p>Upload JPG, PNG, or WebP photos (up to 10 MB each). They appear on the public Photos page.</p></div></div><label class="upload-control">Choose photos<input id="photo-upload" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><div id="photo-library" class="photo-library"></div></section>
+    </section>
+  </div></section>
+</main>
+<footer class="footer" data-site-footer></footer>
+<script src="config.js"></script><script src="script.js"></script><script type="module" src="admin.js"></script>
+</body></html>
