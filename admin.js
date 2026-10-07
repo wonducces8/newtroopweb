@@ -1,10 +1,9 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const cfg = window.TROOP_CONFIG || {};
 const status = document.querySelector('#admin-status');
 const loginForm = document.querySelector('#login-form');
 const editor = document.querySelector('#editor');
 const ready = Boolean(cfg.supabaseUrl && cfg.supabasePublishableKey);
-const supabase = ready ? createClient(cfg.supabaseUrl, cfg.supabasePublishableKey) : null;
+const supabase = ready ? await (window.TROOP_SUPABASE_PROMISE || (window.TROOP_SUPABASE_PROMISE = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({createClient}) => createClient(cfg.supabaseUrl, cfg.supabasePublishableKey)))) : null;
 const bucket = 'troop-photos';
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024;
 function message(text, kind) { status.textContent = text; status.className = 'notice ' + (kind || ''); }
