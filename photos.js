@@ -21,7 +21,7 @@ function render() {
   const groups = new Map();
   visible.forEach(photo => { if (!groups.has(photo.folder_name)) groups.set(photo.folder_name, []); groups.get(photo.folder_name).push(photo); });
   grid.innerHTML = Array.from(groups, ([folder, items]) => '<section class="photo-album"><div class="album-heading"><span>ALBUM</span><h2>' + escapeHtml(folder) + '</h2><small>' + items.length + (items.length === 1 ? ' photo' : ' photos') + '</small></div><div class="photo-grid">' + items.map(photo => {
-    const index = photos.indexOf(photo);
+    const index = visible.indexOf(photo);
     return '<figure class="photo-tile"><button class="photo-open" type="button" data-photo-index="' + index + '" aria-label="View photo full screen"><img src="' + escapeHtml(photo.url) + '" alt="' + escapeHtml(photo.caption || 'Troop 1941 activity photo') + '" loading="lazy"><span class="photo-expand" aria-hidden="true">⛶</span></button>' + (photo.caption ? '<figcaption>' + escapeHtml(photo.caption) + '</figcaption>' : '') + '</figure>';
   }).join('') + '</div></section>').join('');
 }
