@@ -1,4 +1,4 @@
-const navItems = [['Home','index.html'],['Our Troop','about.html'],['Adventure','adventures.html'],['Calendar','calendar.html'],['Photos','photos.html'],['People','people.html']];
+const navItems = [['Home','index.html'],['Our Troop','about.html'],['Calendar','calendar.html'],['Photos','photos.html'],['People','people.html']];
 const currentFile = location.pathname.split('/').pop() || 'index.html';
 const header = document.querySelector('[data-site-header]');
 const footer = document.querySelector('[data-site-footer]');
@@ -25,8 +25,21 @@ if (header) {
       siteSupabase = client;
       client.auth.getSession().then(result => showAdminTools(result.data.session)).catch(() => {});
       client.auth.onAuthStateChange((_event, session) => { setTimeout(() => showAdminTools(session), 0); });
+      const socialSlot = footer && footer.querySelector('[data-social-links]');
+      if (socialSlot) client.from('troop_content').select('value').eq('key', 'socials').maybeSingle().then(result => {
+        const links = result.data && Array.isArray(result.data.value) ? result.data.value : [];
+        links.forEach(item => {
+          try {
+            const url = new URL(item.url);
+            if (url.protocol !== 'https:' || !item.label) return;
+            const link = document.createElement('a'); link.href = url.href; link.textContent = item.label; link.target = '_blank'; link.rel = 'noopener noreferrer';
+            socialSlot.append(link);
+          } catch {}
+        });
+        socialSlot.hidden = !socialSlot.childElementCount;
+      }).catch(() => {});
     }).catch(() => {});
   }
 }
-if (footer) { footer.innerHTML = '<div class="wrap footer-top"><a class="brand" href="index.html"><span class="brand-mark">1941</span><span><b>Troop 1941</b><small>Leesburg, Virginia</small></span></a><p>Adventure, leadership, service.</p><div class="footer-links"><a href="calendar.html">Calendar</a><a href="contact.html">Visit us</a><a href="admin.html">Admin</a></div></div><div class="wrap footer-bottom"><span>© <span data-year></span> Troop 1941</span><span>Chartered by Isaak Walton League of America</span></div>'; }
+if (footer) { footer.innerHTML = '<div class="wrap footer-top"><a class="brand" href="index.html"><span class="brand-mark">1941</span><span><b>Troop 1941</b><small>Leesburg, Virginia</small></span></a><p>Adventure, leadership, service.</p><div class="footer-outlinks"><div class="footer-links"><a href="calendar.html">Calendar</a><a href="contact.html">Visit us</a><a href="admin.html">Admin</a></div><div class="social-links" data-social-links hidden></div></div></div><div class="wrap footer-bottom"><span>© <span data-year></span> Troop 1941</span><span>Chartered by Isaak Walton League of America</span></div>'; }
 document.querySelectorAll('[data-year]').forEach((node) => node.textContent = new Date().getFullYear());
