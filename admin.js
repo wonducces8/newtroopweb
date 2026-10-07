@@ -8,6 +8,7 @@ const bucket = 'troop-photos';
 const MAX_ORIGINAL_SIZE = 25 * 1024 * 1024;
 const MAX_IMAGE_EDGE = 2048;
 let folders = [];
+let currentAdminId = null;
 function message(text, kind) { status.textContent = text; status.className = 'notice ' + (kind || ''); }
 function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function rowHtml(kind, item = {}) {
@@ -37,7 +38,42 @@ async function loadFolders(selectedName) {
   filter.innerHTML = '<option value="">All albums</option>' + folders.map(folder => '<option value="' + escapeHtml(folder.name) + '">' + escapeHtml(folder.name) + '</option>').join('');
   upload.value = folders.some(folder => folder.name === currentUpload) ? currentUpload : (folders[0] && folders[0].name || '');
 }
+async function loadAccessRequests() {
+  const target = document.querySelector('#access-review-list');
+  const result = await supabase.from('photo_access_requests').select('user_id,email,display_name,status,role,requested_at').order('requested_at', {ascending:false});
+  if (result.error) { target.innerHTML = '<p class="notice">Could not load account requests: ' + escapeHtml(result.error.message) + '</p>'; return; }
+  const accounts = result.data || [];
+  if (!accounts.length) { target.innerHTML = '<p class="empty-library">No member accounts have requested access yet.</p>'; return; }
+  target.innerHTML = accounts.map(account => {
+    const userId = escapeHtml(account.user_id);
+    const name = escapeHtml(account.display_name || 'Name not provided');
+    const email = escapeHtml(account.email);
+    const date = new Date(account.requested_at).toLocaleDateString();
+    const role = account.role || 'contributor';
+    const action = account.status === 'approved' ? 'save' : 'approve';
+    const label = account.status === 'approved' ? 'Save permissions' : account.status === 'pending' ? 'Approve account' : 'Approve again';
+    const revoke = account.status === 'approved' ? '<button class="remove-row" type="button" data-access-action="revoke" data-user-id="' + userId + '">Revoke access</button>' : '<button class="remove-row" type="button" data-access-action="reject" data-user-id="' + userId + '">Reject</button>';
+    return '<article class="access-review-row"><div class="access-review-person"><b>' + name + '</b><span>' + email + '</span><small>Requested ' + date + ' · ' + escapeHtml(account.status) + '</small></div><div class="access-review-actions"><label>Permission<select data-access-role="' + userId + '"><option value="contributor"' + (role === 'contributor' ? ' selected' : '') + '>Photo contributor</option><option value="curator"' + (role === 'curator' ? ' selected' : '') + '>Photo curator</option></select></label><button class="button button-green" type="button" data-access-action="' + action + '" data-user-id="' + userId + '">' + label + '</button>' + revoke + '</div></article>';
+  }).join('');
+}
+async function saveAccessAction(action, userId, button) {
+  const roleSelect = document.querySelector('[data-access-role="' + CSS.escape(userId) + '"]');
+  const isApproved = action === 'approve' || action === 'save';
+  const update = {
+    status: isApproved ? 'approved' : 'rejected',
+    role: isApproved ? roleSelect.value : null,
+    reviewed_at: new Date().toISOString(),
+    reviewed_by: currentAdminId
+  };
+  button.disabled = true;
+  const result = await supabase.from('photo_access_requests').update(update).eq('user_id', userId);
+  button.disabled = false;
+  if (result.error) { message('Could not update account permissions: ' + result.error.message, 'admin-status-error'); return; }
+  message(isApproved ? 'Account permissions saved.' : 'Account access revoked.', 'admin-status-good');
+  await loadAccessRequests();
+}
 async function loadEditors(user) {
+  currentAdminId = user.id;
   const access = await supabase.from('site_admins').select('user_id').eq('user_id', user.id).maybeSingle();
   if (access.error || !access.data) throw new Error('This account is not on the admin allowlist. Add it in Supabase, then sign in again.');
   const result = await supabase.from('troop_content').select('key,value').in('key', ['patrols','leaders','announcement','socials']);
@@ -51,6 +87,7 @@ async function loadEditors(user) {
   document.querySelector('#announcement-active').checked = Boolean(values.announcement && values.announcement.active && values.announcement.text);
   document.querySelector('#admin-email').textContent = user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name) || user.email || 'Signed in';
   await loadFolders();
+  await loadAccessRequests();
   loginForm.hidden = true; editor.hidden = false;
   await loadPhotos();
 }
@@ -109,6 +146,14 @@ loginForm.addEventListener('submit', async event => {
 });
 document.querySelector('#sign-out').addEventListener('click', async () => { if (supabase) await supabase.auth.signOut(); });
 document.querySelector('#library-folder').addEventListener('change', loadPhotos);
+document.querySelector('#access-review-list').addEventListener('click', async event => {
+  const button = event.target.closest('[data-access-action]');
+  if (!button || !supabase) return;
+  const action = button.dataset.accessAction;
+  if (action === 'reject' && !window.confirm('Reject this account’s access request?')) return;
+  if (action === 'revoke' && !window.confirm('Revoke this account’s photo permissions?')) return;
+  await saveAccessAction(action, button.dataset.userId, button);
+});
 document.querySelector('#create-folder').addEventListener('click', async () => {
   const input = document.querySelector('#new-folder-name');
   const name = input.value.trim();
