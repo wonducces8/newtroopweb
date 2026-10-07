@@ -26,3 +26,9 @@ section:before{display:none}
 [hidden]{display:none!important}
 
 .adventure-block{margin-top:54px;scroll-margin-top:96px}.adventure-block>h2{margin:12px 0 22px;font-size:clamp(32px,4vw,48px)}.adventure-block .cards{margin-bottom:20px}.adventure-block .info-card h3{font:700 17px var(--heading);letter-spacing:-.035em}.footer-outlinks{display:grid;justify-items:end;gap:8px}.social-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}.social-links[hidden]{display:none!important}.social-links a{display:inline-flex;padding:5px 9px;border:1px solid var(--line);border-radius:999px;color:var(--green);font-size:9px;font-weight:700}.social-links a:hover{border-color:var(--green);background:#e9ede4}@media(max-width:650px){.footer-outlinks{justify-items:start}.social-links{justify-content:flex-start}}
+
+@media(max-width:980px) and (min-width:651px){
+  .nav{gap:14px;font-size:12px}
+  .nav-cta{padding:10px 11px}
+  .site-admin-tools{gap:6px;padding-left:8px;font-size:10px}
+}
