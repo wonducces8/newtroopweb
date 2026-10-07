@@ -40,7 +40,7 @@ async function refreshSession(session) {
 if (!supabase) message('Supabase setup is incomplete. Check config.js and SETUP.md.', 'admin-status-error');
 else {
   supabase.auth.getSession().then(function (result) { return refreshSession(result.data.session); });
-  supabase.auth.onAuthStateChange(function (_event, session) { refreshSession(session); });
+  supabase.auth.onAuthStateChange(function (_event, session) { setTimeout(function () { refreshSession(session); }, 0); });
 }
 loginForm.addEventListener('submit', async function (event) {
   event.preventDefault(); if (!supabase) return;
