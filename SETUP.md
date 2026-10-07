@@ -1,24 +1,24 @@
 # Troop 1941 admin setup
 
-The public site is static. Supabase Auth and Postgres power the roster, announcement, and troop photo library. The website uses only the project URL and browser publishable key; never put a Supabase secret or service-role key in the repository.
+The static site uses Supabase Auth, Postgres, and Storage for the roster, announcements, and public photo albums.
 
 ## First-time setup and updates
 
 1. Create an Auth user for the administrator in Supabase Dashboard → Authentication → Users. Keep public sign-ups disabled.
-2. Open SQL Editor and run the complete `supabase-schema.sql` file. If you already ran an earlier version, run this updated file again to add the announcement field and photo storage bucket/policies. It is safe to rerun.
-3. After the Auth user exists, add its ID to the admin allowlist by running this SQL with the administrator email:
+2. Run the complete `supabase-schema.sql` file in SQL Editor. After an earlier version was run, run this updated script again to add photo albums and captions. It migrates existing root-level photos into the General album and is safe to rerun.
+3. After the Auth user exists, add its ID to the admin allowlist:
    ```sql
    insert into public.site_admins (user_id)
    select id from auth.users where email = 'ADMIN-EMAIL-HERE'
    on conflict do nothing;
    ```
-4. The project URL and publishable key are configured in `config.js`. Do not add a secret key.
-5. Publish the repository as a static website. Sign in at `admin.html` to update patrols, leadership, a home-page announcement, and the photo library.
+4. The project URL and publishable key are set in `config.js`. Never add a Supabase secret or service-role key.
+5. Publish the repo as a static site. The admin page lets authorized administrators update rosters and announcements, create photo albums, upload optimized photos, and edit captions.
 
-## Photo privacy
+## Photo library
 
-Photos uploaded through the admin are visible to anyone who can visit the public site. Upload only troop photos approved for public sharing. The `troop-photos` bucket accepts JPG, PNG, and WebP images up to 10 MB each. Administrators can remove photos in the admin page.
+Albums are public. Photos are resized to a maximum 2048 px on their longest side before upload and converted to WebP while preserving aspect ratio. Captions are optional and hidden when blank. Only upload images approved for public sharing. Administrators can delete photos in the admin page.
 
 ## Access controls
 
-Only user IDs in `site_admins` can update roster content, upload photos, or delete photos. Public visitors can read the public roster, announcement, and photo library. Manage administrator access by adding or removing rows in `site_admins` using SQL Editor. Never use a Supabase secret/service-role key in browser code.
+Only user IDs in `site_admins` can edit content, create albums, upload photos, edit captions, or delete photos. Public visitors can read public content and photos. Never use a Supabase secret/service-role key in browser code.
