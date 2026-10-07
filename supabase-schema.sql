@@ -7,7 +7,7 @@ create table if not exists public.troop_content (
 alter table public.troop_content drop constraint if exists troop_content_key_check;
 alter table public.troop_content
   add constraint troop_content_key_check
-  check (key in ('patrols', 'leaders', 'announcement'));
+  check (key in ('patrols', 'leaders', 'announcement', 'socials'));
 
 create table if not exists public.site_admins (
   user_id uuid primary key references auth.users(id) on delete cascade
