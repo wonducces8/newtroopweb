@@ -26,7 +26,16 @@
       <section class="info-card editor-card"><div class="editor-title"><div><h2>Patrols</h2><p>Update patrol names, leaders, and descriptions.</p></div><button class="button button-green" data-add="patrols" type="button">+ Add patrol</button></div><div id="patrol-editor" class="edit-rows"></div><button class="button button-dark save-button" data-save="patrols" type="button">Save patrols</button></section>
       <section class="info-card editor-card"><div class="editor-title"><div><h2>Leadership</h2><p>Update troop roles and the scouts holding each role.</p></div><button class="button button-green" data-add="leaders" type="button">+ Add role</button></div><div id="leader-editor" class="edit-rows"></div><button class="button button-dark save-button" data-save="leaders" type="button">Save leadership</button></section>
       <section class="info-card editor-card"><div class="editor-title"><div><h2>Troop announcement</h2><p>Post a short update on the home page, or turn it off when it’s no longer needed.</p></div></div><label class="wide-label" for="announcement-text">Message</label><textarea id="announcement-text" class="admin-textarea" maxlength="240" placeholder="Example: No meeting this Monday—see you at the campout!"></textarea><label class="check-label"><input id="announcement-active" type="checkbox"> Show this announcement on the home page</label><button class="button button-dark save-button" data-save="announcement" type="button">Save announcement</button></section>
-      <section class="info-card editor-card"><div class="editor-title"><div><h2>Photo library</h2><p>Upload JPG, PNG, or WebP photos (up to 10 MB each). They appear on the public Photos page.</p></div></div><label class="upload-control">Choose photos<input id="photo-upload" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><div id="photo-library" class="photo-library"></div></section>
+      <section class="info-card editor-card"><div class="editor-title"><div><h2>Photo library</h2><p>JPG, PNG, or WebP images are optimized to 2048 px while preserving their proportions.</p></div></div>
+        <div class="folder-tools">
+          <label>Upload to album<select id="photo-upload-folder"></select></label>
+          <div class="new-folder"><label for="new-folder-name">New album</label><div><input id="new-folder-name" maxlength="40" placeholder="e.g. Spring campout"><button id="create-folder" class="button button-green" type="button">Create album</button></div></div>
+        </div>
+        <label class="wide-label" for="photo-upload-caption">Caption for these uploads (optional)</label><input id="photo-upload-caption" class="caption-entry" maxlength="180" placeholder="Add the same caption to all selected photos, or leave blank">
+        <label class="upload-control">Choose photos<input id="photo-upload" type="file" accept="image/jpeg,image/png,image/webp" multiple></label>
+        <div class="library-filter"><label for="library-folder">Manage album</label><select id="library-folder"><option value="">All albums</option></select></div>
+        <div id="photo-library" class="photo-library"></div>
+      </section>
     </section>
   </div></section>
 </main>
