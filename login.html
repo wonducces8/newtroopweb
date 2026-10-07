@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Sign in or request an approved Troop 1941 website account.">
+  <title>Member sign in · Troop 1941</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="roster.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a><header class="header" data-site-header></header>
+<main id="main">
+  <section class="page-hero account-hero"><div class="wrap"><div class="kicker"><span class="dot"></span> TROOP 1941 · MEMBER ACCESS</div><h1>Your troop<br><em>account.</em></h1><p>Sign in to your approved account, or request one. An administrator reviews every new account and assigns its permissions.</p></div></section>
+  <section class="page-content account-content"><div class="wrap account-layout">
+    <div id="account-status" class="notice" role="status">Connecting to the troop account system…</div>
+    <section id="signed-in-panel" class="account-card" hidden>
+      <div class="kicker">ACCOUNT STATUS</div><h2 id="account-heading">Welcome.</h2>
+      <p id="account-summary"></p>
+      <div id="account-actions" class="account-actions"></div>
+      <button id="account-signout" class="button button-dark" type="button">Sign out</button>
+    </section>
+    <div id="account-forms" class="account-forms">
+      <form id="sign-in-form" class="account-card">
+        <div class="kicker">WELCOME BACK</div><h2>Sign in</h2>
+        <label>Email<input name="email" type="email" autocomplete="username" required></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+        <button class="button button-green" type="submit">Sign in →</button>
+      </form>
+      <form id="sign-up-form" class="account-card">
+        <div class="kicker">NEW TO THE SITE?</div><h2>Request an account</h2>
+        <p>Scouts and adults can request access. Your account stays pending until an administrator approves it and assigns photo permissions.</p>
+        <label>Your name<input name="full_name" autocomplete="name" maxlength="80" required></label>
+        <label>Email<input name="email" type="email" autocomplete="email" required></label>
+        <label>Create a password<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+        <button class="button button-green" type="submit">Request access →</button>
+        <small>We’ll ask you to confirm your email if email confirmation is enabled for the troop site.</small>
+      </form>
+    </div>
+  </div></section>
+</main>
+<footer class="footer" data-site-footer></footer>
+<script src="config.js"></script><script src="script.js"></script><script type="module" src="account.js"></script>
+</body></html>

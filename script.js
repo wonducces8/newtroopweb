@@ -10,21 +10,38 @@ if (header) {
   const nav = header.querySelector('.nav');
   navItems.forEach(([label, href]) => { const a = document.createElement('a'); a.href = href; a.textContent = label; if (href === currentFile) a.setAttribute('aria-current','page'); nav.append(a); });
   const visit = document.createElement('a'); visit.href = 'contact.html'; visit.className = 'nav-cta'; visit.textContent = 'Visit a meeting ↗'; nav.append(visit);
-  const tools = document.createElement('div'); tools.className = 'site-admin-tools'; tools.hidden = true;
-  tools.innerHTML = '<a href="admin.html">Admin tools <span aria-hidden="true">↗</span></a><button type="button" data-site-signout>Sign out</button>';
+  const tools = document.createElement('div'); tools.className = 'site-admin-tools'; tools.hidden = false;
+  tools.innerHTML = '<a data-site-account href="login.html">Sign in</a><a data-site-upload href="photos.html#member-photo-tools" hidden>Photo tools ↗</a><a data-site-admin href="admin.html" hidden>Admin tools ↗</a><button type="button" data-site-signout hidden>Sign out</button>';
   nav.append(tools);
   const toggle = header.querySelector('.menu-toggle');
   toggle.addEventListener('click', () => { const open = toggle.getAttribute('aria-expanded') === 'true'; toggle.setAttribute('aria-expanded',String(!open)); toggle.setAttribute('aria-label',open?'Open menu':'Close menu'); nav.classList.toggle('open',!open); });
   nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => { toggle.setAttribute('aria-expanded','false'); nav.classList.remove('open'); }));
   tools.querySelector('[data-site-signout]').addEventListener('click', async () => { if (siteSupabase) await siteSupabase.auth.signOut(); });
-  function showAdminTools(session) { tools.hidden = !session; }
+  const accountLink = tools.querySelector('[data-site-account]');
+  const uploadLink = tools.querySelector('[data-site-upload]');
+  const adminLink = tools.querySelector('[data-site-admin]');
+  const signoutButton = tools.querySelector('[data-site-signout]');
+  async function showAccountTools(session) {
+    tools.hidden = false;
+    accountLink.textContent = session ? 'Account' : 'Sign in';
+    signoutButton.hidden = !session;
+    uploadLink.hidden = true;
+    adminLink.hidden = true;
+    if (!session || !siteSupabase) return;
+    const [admin, access] = await Promise.all([
+      siteSupabase.from('site_admins').select('user_id').eq('user_id', session.user.id).maybeSingle(),
+      siteSupabase.from('photo_access_requests').select('status').eq('user_id', session.user.id).maybeSingle()
+    ]);
+    adminLink.hidden = Boolean(admin.error || !admin.data);
+    uploadLink.hidden = Boolean(access.error || !access.data || access.data.status !== 'approved') && Boolean(admin.error || !admin.data);
+  }
   const config = window.TROOP_CONFIG || {};
   if (config.supabaseUrl && config.supabasePublishableKey) {
     window.TROOP_SUPABASE_PROMISE = window.TROOP_SUPABASE_PROMISE || import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({createClient}) => createClient(config.supabaseUrl, config.supabasePublishableKey));
     window.TROOP_SUPABASE_PROMISE.then(client => {
       siteSupabase = client;
-      client.auth.getSession().then(result => showAdminTools(result.data.session)).catch(() => {});
-      client.auth.onAuthStateChange((_event, session) => { setTimeout(() => showAdminTools(session), 0); });
+      client.auth.getSession().then(result => showAccountTools(result.data.session)).catch(() => {});
+      client.auth.onAuthStateChange((_event, session) => { setTimeout(() => showAccountTools(session), 0); });
       const socialSlot = footer && footer.querySelector('[data-social-links]');
       if (socialSlot) client.from('troop_content').select('value').eq('key', 'socials').maybeSingle().then(result => {
         const links = result.data && Array.isArray(result.data.value) ? result.data.value : [];
