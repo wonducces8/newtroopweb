@@ -11,10 +11,10 @@ A responsive static site for Scout Troop 1941 in Leesburg, Virginia, with separa
 - photos.html: troop slideshow
 - people.html: live patrol and leadership roster
 - contact.html: directions and Scoutmaster contact
-- admin.html: secure roster editor for authorized administrators
+- admin.html: secure editor for rosters, home announcements, and shared troop photos
 
 ## Admin setup
 
-The roster editor uses Supabase Auth and Postgres. Follow SETUP.md and run supabase-schema.sql in the Supabase SQL Editor. The public site uses the project URL and publishable key in config.js; row-level security restricts writes to the authorized admin allowlist. Never add a Supabase secret/service-role key or login password to the site.
+The admin editor uses Supabase Auth, Postgres, and Storage for rosters, announcements, and a public shuffled photo gallery. Follow SETUP.md and run supabase-schema.sql in the Supabase SQL Editor. The site uses only the project URL and publishable key in config.js; row-level security limits edits, uploads, and deletes to the admin allowlist. Never add a Supabase secret/service-role key or login password to the site.
 
 The static site can be hosted by any service that serves the files from this repository.
