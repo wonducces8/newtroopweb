@@ -11,6 +11,7 @@ let folders = [];
 function message(text, kind) { status.textContent = text; status.className = 'notice ' + (kind || ''); }
 function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function rowHtml(kind, item = {}) {
+  if (kind === 'socials') return '<div class="edit-row social-edit-row" data-kind="socials"><label>Platform or label<input data-field="label" value="' + escapeHtml(item.label) + '" placeholder="Instagram" required></label><label>Profile URL<input data-field="url" type="url" value="' + escapeHtml(item.url) + '" placeholder="https://…" required></label><button type="button" class="remove-row" aria-label="Remove link">Remove</button></div>';
   const patrol = kind === 'patrols';
   let html = '<div class="edit-row" data-kind="' + kind + '">';
   html += '<label>' + (patrol ? 'Patrol name' : 'Position') + '<input data-field="' + (patrol ? 'name' : 'role') + '" value="' + escapeHtml(item[patrol ? 'name' : 'role']) + '" required></label>';
@@ -23,7 +24,7 @@ function readRows(kind) {
     const values = {};
     row.querySelectorAll('[data-field]').forEach(field => { if (field.value.trim()) values[field.dataset.field] = field.value.trim(); });
     return values;
-  }).filter(row => kind === 'patrols' ? row.name : row.role && row.name);
+  }).filter(row => kind === 'patrols' ? row.name : kind === 'leaders' ? row.role && row.name : row.label && row.url);
 }
 async function loadFolders(selectedName) {
   const result = await supabase.from('photo_folders').select('name').order('name');
@@ -39,12 +40,13 @@ async function loadFolders(selectedName) {
 async function loadEditors(user) {
   const access = await supabase.from('site_admins').select('user_id').eq('user_id', user.id).maybeSingle();
   if (access.error || !access.data) throw new Error('This account is not on the admin allowlist. Add it in Supabase, then sign in again.');
-  const result = await supabase.from('troop_content').select('key,value').in('key', ['patrols','leaders','announcement']);
+  const result = await supabase.from('troop_content').select('key,value').in('key', ['patrols','leaders','announcement','socials']);
   if (result.error) throw result.error;
   const values = {};
   (result.data || []).forEach(row => { values[row.key] = row.value; });
   document.querySelector('#patrol-editor').innerHTML = (values.patrols || []).map(row => rowHtml('patrols', row)).join('');
   document.querySelector('#leader-editor').innerHTML = (values.leaders || []).map(row => rowHtml('leaders', row)).join('');
+  document.querySelector('#social-editor').innerHTML = (values.socials || []).map(row => rowHtml('socials', row)).join('');
   document.querySelector('#announcement-text').value = values.announcement && values.announcement.text || '';
   document.querySelector('#announcement-active').checked = Boolean(values.announcement && values.announcement.active && values.announcement.text);
   document.querySelector('#admin-email').textContent = user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name) || user.email || 'Signed in';
@@ -123,13 +125,19 @@ document.addEventListener('click', async event => {
   const save = event.target.closest('[data-save]');
   const deletePhoto = event.target.closest('[data-photo-delete]');
   const saveCaption = event.target.closest('[data-save-caption]');
-  if (add) document.querySelector(add.dataset.add === 'patrols' ? '#patrol-editor' : '#leader-editor').insertAdjacentHTML('beforeend', rowHtml(add.dataset.add));
+  if (add) { const target = add.dataset.add === 'patrols' ? '#patrol-editor' : add.dataset.add === 'socials' ? '#social-editor' : '#leader-editor'; document.querySelector(target).insertAdjacentHTML('beforeend', rowHtml(add.dataset.add)); }
   if (remove) remove.closest('.edit-row').remove();
   if (save && supabase) {
     if (save.dataset.save === 'announcement') {
       const text = document.querySelector('#announcement-text').value.trim();
       await saveContent('announcement', {text, active: document.querySelector('#announcement-active').checked && Boolean(text)}, 'Announcement');
-    } else await saveContent(save.dataset.save, readRows(save.dataset.save), save.dataset.save === 'patrols' ? 'Patrols' : 'Leadership');
+    } else {
+      const key = save.dataset.save; const value = readRows(key);
+      if (key === 'socials') {
+        for (const item of value) { try { const url = new URL(item.url); if (url.protocol !== 'https:') throw new Error(); item.url = url.href; } catch { message('Each social link must use a valid https:// URL.', 'admin-status-error'); return; } }
+      }
+      await saveContent(key, value, key === 'patrols' ? 'Patrols' : key === 'leaders' ? 'Leadership' : 'Social links');
+    }
   }
   if (saveCaption && supabase) {
     const path = saveCaption.dataset.saveCaption;
