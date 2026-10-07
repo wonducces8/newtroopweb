@@ -6,12 +6,12 @@ A responsive static site for Scout Troop 1941 in Leesburg, Virginia, with separa
 
 - index.html: home page with animated campsite illustration
 - about.html: troop overview and meeting details
-- adventures.html: camp, skills, and service
+- about.html: troop overview, meeting details, camp, skills, and service
 - calendar.html: live Google Calendar
-- photos.html: public troop albums with optional captions and shuffle
+- photos.html: public albums with captions, full-aspect photos, and shuffle
 - people.html: live patrol and leadership roster
 - contact.html: directions and Scoutmaster contact
-- admin.html: secure roster, announcement, and photo album editor
+- admin.html: secure roster, announcement, social link, and photo album editor
 
 ## Admin setup
 
