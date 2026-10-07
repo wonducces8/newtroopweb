@@ -104,7 +104,7 @@ document.querySelector('#sign-up-form').addEventListener('submit', async event =
     await showAccount(result.data.session);
   } else {
     form.reset();
-    setStatus('Request received. Check your email to confirm the address, then sign in here. Your account will remain pending until an administrator approves it.', 'account-status-good');
+    setStatus('Check your email to confirm the address. After confirmation, your account request will go to an administrator for review. You can sign in here to check approval status.', 'account-status-good');
   }
 });
 document.querySelector('#account-signout').addEventListener('click', async () => {
