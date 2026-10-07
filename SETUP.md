@@ -13,7 +13,7 @@ The static site uses Supabase Auth, Postgres, and Storage for the roster, announ
    on conflict do nothing;
    ```
 4. The project URL and publishable key are set in `config.js`. Never add a Supabase secret or service-role key.
-5. Publish the repo as a static site. The admin page lets authorized administrators update rosters and announcements, create photo albums, upload optimized photos, and edit captions.
+5. Publish the repo as a static site. The admin page lets authorized administrators update rosters and announcements, create photo albums, upload optimized photos, edit captions, and manage social profile links.
 
 ## Photo library
 
@@ -21,4 +21,4 @@ Albums are public. Photos are resized to a maximum 2048 px on their longest side
 
 ## Access controls
 
-Only user IDs in `site_admins` can edit content, create albums, upload photos, edit captions, or delete photos. Public visitors can read public content and photos. Never use a Supabase secret/service-role key in browser code.
+Only user IDs in `site_admins` can edit content, create albums, upload photos, edit captions, manage social links, or delete photos. Public visitors can read public content and photos. Never use a Supabase secret/service-role key in browser code.
