@@ -1,0 +1,2 @@
+[functions.photo-request-notification]
+verify_jwt = false
