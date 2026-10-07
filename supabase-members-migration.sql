@@ -62,6 +62,13 @@ language plpgsql security definer
 set search_path = ''
 as $$
 begin
+  -- Do not put unconfirmed addresses into the review queue or send alerts for them.
+  if new.email_confirmed_at is null then
+    return new;
+  end if;
+  if tg_op = 'UPDATE' and old.email_confirmed_at is not null then
+    return new;
+  end if;
   insert into public.photo_access_requests(user_id, email, display_name)
   values (
     new.id,
@@ -71,11 +78,15 @@ begin
   on conflict (user_id) do nothing;
   return new;
 end;
-$$;
+$;
 
 drop trigger if exists create_photo_access_request_after_signup on auth.users;
+drop trigger if exists create_photo_access_request_after_email_confirmation on auth.users;
 create trigger create_photo_access_request_after_signup
   after insert on auth.users
+  for each row execute function public.create_photo_access_request();
+create trigger create_photo_access_request_after_email_confirmation
+  after update of email_confirmed_at on auth.users
   for each row execute function public.create_photo_access_request();
 
 -- Keep the current admin-only controls, while allowing approved contributors to
