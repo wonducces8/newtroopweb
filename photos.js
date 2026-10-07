@@ -2,7 +2,7 @@ const cfg = window.TROOP_CONFIG || {};
 const grid = document.querySelector('#photo-gallery');
 const status = document.querySelector('#gallery-status');
 const button = document.querySelector('#shuffle-photos');
-const client = cfg.supabaseUrl && cfg.supabasePublishableKey ? await (window.TROOP_SUPABASE_PROMISE || (window.TROOP_SUPABASE_PROMISE = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({createClient}) => createClient(cfg.supabaseUrl, cfg.supabasePublishableKey)))) : null;
+const client = cfg.supabaseUrl && cfg.supabasePublishableKey ? await (window.TROOP_SUPABASE_PROMISE || (window.TROOP_SUPABASE_PROMISE = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({createClient}) => createClient(cfg.supabaseUrl, cfg.supabasePublishableKey)))).catch(() => null) : null;
 const bucket = 'troop-photos';
 let photos = [];
 function escapeHtml(value) { return String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
