@@ -17,7 +17,7 @@ async function getTroopContent(key) {
 }
 function safeText(value) {
   return String(value || '').replace(/[&<>"']/g, function (c) {
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
   });
 }
 function renderRoster(selector, rows, emptyMessage, isPatrol) {
@@ -37,4 +37,13 @@ async function loadRoster() {
   renderRoster('#patrol-list', results[0], 'Current patrol details will appear here after an administrator adds them.', true);
   renderRoster('#leader-list', results[1], 'Current leadership details will appear here after an administrator adds them.', false);
 }
+async function loadAnnouncement() {
+  const banner = document.querySelector('[data-troop-announcement]');
+  if (!banner) return;
+  const announcement = await getTroopContent('announcement');
+  if (!announcement || !announcement.active || !announcement.text) return;
+  banner.textContent = announcement.text;
+  banner.hidden = false;
+}
 if (document.querySelector('#patrol-list, #leader-list')) loadRoster();
+if (document.querySelector('[data-troop-announcement]')) loadAnnouncement();
