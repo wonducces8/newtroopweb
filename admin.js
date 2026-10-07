@@ -25,6 +25,8 @@ function readRows(kind) {
   }).filter(row => kind === 'patrols' ? row.name : row.role && row.name);
 }
 async function loadEditors(user) {
+  const access = await supabase.from('site_admins').select('user_id').eq('user_id', user.id).maybeSingle();
+  if (access.error || !access.data) throw new Error('This account is not on the admin allowlist. Add it in Supabase, then sign in again.');
   const result = await supabase.from('troop_content').select('key,value').in('key', ['patrols','leaders','announcement']);
   if (result.error) throw result.error;
   const values = {};
