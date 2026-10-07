@@ -22,6 +22,7 @@ async function showAccount(session) {
   if (!session || !client) {
     forms.hidden = false;
     signedPanel.hidden = true;
+    setStatus('Sign in or request a member account below.');
     return;
   }
   forms.hidden = true;
