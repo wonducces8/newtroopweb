@@ -6,7 +6,7 @@ The public site uses GitHub Pages. Supabase provides sign-in, approved member ph
 
 1. In Supabase Dashboard → SQL Editor, run `supabase-schema.sql` if the original site schema has not been installed.
 2. Then run `supabase-members-migration.sql`. This adds signup requests, admin approval, and contributor/curator permissions while preserving the existing photo albums and admin accounts.
-3. In Authentication → Providers, enable Email sign-in and allow new signups. Keep email confirmation enabled. New signups get a pending account request automatically; they cannot upload until an administrator approves them.
+3. In Authentication → Providers, enable Email sign-in and allow new signups. Keep email confirmation enabled. After email confirmation, each new signup gets a pending account request automatically; it cannot upload until an administrator approves it.
 4. In Authentication → URL Configuration, set the Site URL to the published troop website and add its `/login.html` URL to the allowed redirect URLs.
 5. Keep the existing `site_admins` allowlist. Only accounts in that table can edit the roster, announcements, social links, or approve and assign photo roles.
 
