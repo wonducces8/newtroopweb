@@ -1,0 +1,10 @@
+{
+  "name": "newtroopweb",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A refreshed static website for Scout Troop 1941 in Leesburg, Virginia.",
+  "scripts": {
+    "start": "npx http-server -p 4173 -c-1 .",
+    "serve": "npx http-server -p 4173 -c-1 ."
+  }
+}
