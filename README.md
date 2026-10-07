@@ -1,15 +1,20 @@
-# Troop 1941
+# Troop 1941 website
 
-A responsive static website for Scout Troop 1941 in Leesburg, Virginia. The site now has separate pages for the troop, adventures, calendar, photos, patrols and leadership, and visiting/contact.
+A responsive static site for Scout Troop 1941 in Leesburg, Virginia, with separate pages for troop details, adventures, calendar, photos, people, and contact.
 
 ## Pages
 
-- `index.html` — home page with a gently animated campsite illustration
-- `about.html` — troop overview and meeting information
-- `adventures.html` — camping, skills, and service
-- `calendar.html` — live Google Calendar
-- `photos.html` — troop slideshow
-- `people.html` — patrol and leadership page; current roster will be added when confirmed
-- `contact.html` — meeting directions and Scoutmaster contact
+- index.html: home page with animated campsite illustration
+- about.html: troop overview and meeting details
+- adventures.html: camp, skills, and service
+- calendar.html: live Google Calendar
+- photos.html: troop slideshow
+- people.html: live patrol and leadership roster
+- contact.html: directions and Scoutmaster contact
+- admin.html: secure roster editor for authorized administrators
 
-The public site is plain HTML, CSS, and JavaScript and can be hosted on any static hosting service. The admin backend is not configured in this version.
+## Admin setup
+
+The roster editor uses Supabase Auth and Postgres. Follow SETUP.md and run supabase-schema.sql in the Supabase SQL Editor. The public site uses the project URL and publishable key in config.js; row-level security restricts writes to the authorized admin allowlist. Never add a Supabase secret/service-role key or login password to the site.
+
+The static site can be hosted by any service that serves the files from this repository.
