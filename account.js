@@ -72,20 +72,6 @@ if (!client) {
   }
   client.auth.onAuthStateChange((_event, session) => setTimeout(() => showAccount(session), 0));
 }
-document.querySelector('#google-sign-in').addEventListener('click', async event => {
-  if (!client) return;
-  const button = event.currentTarget;
-  button.disabled = true;
-  setStatus('Connecting to Google…');
-  const result = await client.auth.signInWithOAuth({
-    provider: 'google',
-    options: {redirectTo: new URL('login.html', location.href).href}
-  });
-  if (result.error) {
-    button.disabled = false;
-    setStatus('Google sign-in failed: ' + safeMessage(result.error), 'account-status-error');
-  }
-});
 document.querySelector('#sign-in-form').addEventListener('submit', async event => {
   event.preventDefault();
   if (!client) return;
