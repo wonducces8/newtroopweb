@@ -69,3 +69,11 @@
 .viewer-arrow{position:relative;top:auto;grid-row:2;align-self:center;margin:0}
 .viewer-caption{grid-row:3;max-height:18vh;overflow:auto;padding:8px 16px 14px}
 @media(max-width:700px){.photo-viewer[open]{grid-template-columns:42px minmax(0,1fr) 42px;grid-template-rows:52px minmax(0,1fr) auto}.viewer-top{min-height:52px}.viewer-stage{padding:4px}.viewer-caption{max-height:16vh}.viewer-arrow{width:32px;height:32px}}
+
+/* Google OAuth button on member sign-in. */
+.google-sign-in{display:flex;width:100%;gap:12px;justify-content:center;margin:8px 0 0;border:1px solid #d8ddd4;background:#fff;color:#28352b;box-shadow:0 4px 12px #182a1c0a}
+.google-sign-in:hover{background:#f8faf7}
+.google-sign-in svg{width:19px;height:19px;flex:none}
+.google-sign-in span{font:600 13px var(--body)}
+.login-divider{display:flex;align-items:center;gap:12px;margin:15px 0;color:#889087;font-size:10px}
+.login-divider::before,.login-divider::after{content:"";height:1px;flex:1;background:var(--line)}
